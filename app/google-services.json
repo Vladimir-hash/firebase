@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "463118701168",
+    "project_id": "neco-e0d1a",
+    "storage_bucket": "neco-e0d1a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:463118701168:android:71a3ab4ba76401cd1bdab5",
+        "android_client_info": {
+          "package_name": "com.example.neco"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrj8QV5ME5vi47wvfVWgRVts7pbtVpLeI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
