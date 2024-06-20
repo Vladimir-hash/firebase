@@ -35,6 +35,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.neco.data.Book
+import com.example.neco.login.LoginScreen
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -46,108 +47,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val fs = Firebase.firestore
         setContent {
-            val fs = Firebase.firestore
-            val storage = Firebase.storage.reference.child("images")
-
-            val launcher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.PickVisualMedia()
-            ) { uri ->
-                if (uri == null) return@rememberLauncherForActivityResult
-                val task = storage.child("sneaker.jpg").putBytes(
-                    bitmapToByteArray(this, uri)
-                )
-                task.addOnSuccessListener { uploadTask ->
-                    uploadTask.metadata?.reference?.downloadUrl?.addOnCompleteListener { uriTask ->
-                        saveBook(fs, uriTask.result.toString())
-                    }
-                }
-            }
-            MainScreen {
-                launcher.launch(
-                    PickVisualMediaRequest(
-                        mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly))
-            }
+            LoginScreen()
         }
     }
 }
 
-@Composable
-fun MainScreen(onClick: () -> Unit) {
-    val fs = Firebase.firestore
-    val list = remember {
-        mutableStateOf(emptyList<Book>())
-
-    }
-
-    fs.collection("books").addSnapshotListener { snapShot, exception ->
-        list.value = snapShot?.toObjects(Book::class.java) ?: emptyList()
-    }
-
-
-    Column(
-        modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween
-    ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.8f)
-        ) {
-            items(list.value) { book ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        AsyncImage(
-                            model = book.imageUrl,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .height(100.dp)
-                                .width(100.dp)
-
-                        )
-                        Text(
-                            text = book.name, modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentWidth()
-                        )
-                    }
-
-                }
-            }
-        }
-    }
-
-    Spacer(modifier = Modifier.height(10.dp))
-    Button(modifier = Modifier
-        .fillMaxWidth()
-        .padding(10.dp), onClick = {
-        onClick()
-    }) {
-        Text(
-            text = "Add book",
-        )
-    }
-}
-
-
-private fun bitmapToByteArray(context: Context, uri: Uri): ByteArray {
-    val inputStream = context.contentResolver.openInputStream(uri)
-    val bitmap = BitmapFactory.decodeStream(inputStream)
-    val baos = ByteArrayOutputStream()
-    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-    return baos.toByteArray()
-}
-
-private fun saveBook(fs: FirebaseFirestore, url: String) {
-    fs.collection("books").document().set(
-            Book(
-                "My book", "Bla Bla", "100", "fiction", url
-            )
-        )
-}
 
